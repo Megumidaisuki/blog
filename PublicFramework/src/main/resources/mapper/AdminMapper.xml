@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.megumi.mapper.AdminMapper">
+
+    <resultMap id="MenuMessageMap" type="com.megumi.entity.DTO.MenuMessageDTO">
+        <result column="create_time" property="createTime"/>
+        <result column="menu_name" property="menuName"/>
+        <result column="menu_type" property="menuType"/>
+        <result column="order_num" property="orderNum"/>
+        <result column="parent_id" property="parentId"/>
+    </resultMap>
+
+    <select id="getRoleName" resultType="java.lang.String">
+
+        select sr.role_name
+        from sys_user_role sur,
+             sys_role sr
+        where sur.user_id = #{userId}
+          and sur.role_id = sr.id
+          and sr.del_flag = 0;
+
+    </select>
+    <select id="getAuthByRoleName" resultType="java.lang.String">
+
+        select sm.perms
+        from sys_menu sm,
+             sys_role sr,
+             sys_role_menu srm
+        where sr.role_name = #{roleName}
+          and sr.id = srm.role_id
+          and srm.menu_id = sm.id;
+
+    </select>
+    <select id="getMenuMessageById" resultMap="MenuMessageMap">
+        select distinct sm.component,
+                        sm.create_time,
+                        sm.icon,
+                        sm.id,
+                        sm.menu_name,
+                        sm.menu_type,
+                        sm.order_num,
+                        sm.parent_id,
+                        sm.path,
+                        sm.perms,
+                        sm.status,
+                        sm.visible
+        from sys_menu sm,
+             sys_user_role sur,
+             sys_role_menu srm
+        where sur.role_id = srm.role_id
+          and srm.menu_id = sm.id
+          and sm.parent_id = 0;
+
+
+
+    </select>
+    <select id="getSonMenu" resultType="com.megumi.entity.DTO.MenuMessageDTO">
+        select
+            component,
+            create_time,
+            icon,
+            id,
+            menu_name,
+            menu_type,
+            order_num,
+            parent_id,
+            `path`,
+            perms,
+            status,
+            visible
+            from sys_menu where parent_id = #{menuId}
+    </select>
+</mapper>
